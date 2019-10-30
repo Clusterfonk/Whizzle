@@ -17,47 +17,72 @@
  */
 
 #include "network_manager.h"
+#include <iostream>
 
 Network_Manager::Network_Manager() {
-	this->ip_addr = sf::IpAddress::getPublicAddress();
+    connection_count = 0;
+	//ip_addr = sf::IpAddress::getPublicAddress();
+    ip_addr = "127.0.0.1"; // DEBUG!
+    max_connections = 6;
+
+    l_thread = new std::thread(&Network_Manager::receive, this);
+    l_thread->detach();
+    printf("thread launching\n");
 }
 
 Network_Manager::~Network_Manager() {
+    isListening = false;
 }
 
-sf::Socket::Status Network_Manager::listen() {
-	sf::Socket::Status con_status = tcp_listener.listen(this->port);
-	if (con_status != sf::Socket::Done) {
-		printf("listen error");
-		return con_status;
-	}
-	sf::TcpSocket socket;
-	con_status = tcp_listener.accept(socket);
-	if (con_status != sf::Socket::Done) {
-		printf("accept error");
-		return con_status;
-	} 
-	this->con_list.push_back(&socket);
-	return con_status;
+void Network_Manager::receive() {
+    selector.add(tcp_listener);
+    isListening = true;
+    if (tcp_listener.listen(this->port) != sf::Socket::Done) {
+    std::cout << "Started listening to incoming connection requests" << std::endl;
+    }
+
+    while(isListening) {
+        if (selector.wait()) {
+            if (selector.isReady(tcp_listener)) {
+                std::unique_ptr<sf::TcpSocket> socket = std::make_unique<sf::TcpSocket>();
+                if (tcp_listener.accept(*socket) == sf::Socket::Done) {
+                    if (connection_count < max_connections) { // Server not full
+                        printf("accepted connection\n");
+                        l_mutex.lock(); // !Lock 
+                        player_list->emplace_back(Player(&socket, connection_count));
+                        selector.add(*player_list->back().GetSocket());
+                        connection_count++;
+                        this->l_mutex.unlock(); // !Unlock
+                    } else { // Server full
+
+                    }
+                } 
+            } else {
+                for(auto& player: *player_list) {
+                    if(selector.isReady(*player.GetSocket())) {
+                        sf::Packet packet;
+                        if (player.GetSocket()->receive(packet) == sf::Socket::Done) {
+                            receivedPackets.push(packet);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
+
+/**
 sf::Socket::Status Network_Manager::connect(const sf::IpAddress &ip) {
-	sf::TcpSocket socket;
-	sf::Socket::Status con_status = socket.connect(ip, this->port);
+    std::unique_ptr<sf::TcpSocket> socket = std::make_unique<sf::TcpSocket>();
+	sf::Socket::Status con_status = socket->connect(ip, this->port);
 	if(con_status != sf::Socket::Done) {
 		printf("Couldn't establish connection with %s\n", ip.toString().c_str());
 		return con_status;
 	}
-	this->con_list.push_back(&socket);
+    this->player_list->emplace_back(Player(&socket, connection_count));
 	return con_status;
-}
-
-// TODO
-void Network_Manager::establish_connection() {
-	//this->listen();
-
-	//this->connect(); //needs ip of which failed to connect
-}
+}*/
 
 void Network_Manager::broadcast_msg(){
 }

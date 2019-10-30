@@ -22,6 +22,13 @@
 #include <list>
 #include <SFML/Network.hpp>
 #include <stdio.h>
+#include <SFML/System.hpp>
+#include <queue>
+#include "player.h"
+#include <thread>
+#include <memory>
+
+#define MAX_MSG_BUFFER 2048
 
 class Network_Manager {
 	public:
@@ -29,21 +36,32 @@ class Network_Manager {
 		~Network_Manager();
 
 		sf::TcpSocket tcp_socket;
-		sf::TcpListener tcp_listener;
 		
 		sf::IpAddress ip_addr;
-		unsigned short const static port = 50001;
+		unsigned short const static port = 8000;
+
+        int connection_count;
 
 		void update();
 
-		std::list<sf::TcpSocket*> con_list;
-
-		sf::Socket::Status listen();
+		std::list<Player>* player_list; // SHARED RESOURCE!
 
 		sf::Socket::Status connect(const sf::IpAddress &ip);
 
-		void establish_connection();
-
 		void broadcast_msg();
+
+        bool isListening = false;
+
+    private:
+		void receive();
+        unsigned short max_connections;
+
+		sf::TcpListener tcp_listener;
+        sf::SocketSelector selector;
+        std::thread* l_thread = nullptr;
+        sf::Mutex l_mutex;
+
+        std::queue<sf::Packet> receivedPackets;
+        char msg_buffer[MAX_MSG_BUFFER];
 };
 #endif

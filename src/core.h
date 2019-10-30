@@ -20,6 +20,7 @@
 #define CORE_HEADER
 
 #include <assert.h>
+#include "network_manager.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 

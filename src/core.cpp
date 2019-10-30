@@ -17,6 +17,7 @@
  */
 
 #include "core.h"
+#include <iostream>
 
 Core::Core() {
 }
@@ -26,6 +27,7 @@ Core::~Core() {
 
 void Core::run() {
 	displayInit();
+    Network_Manager n_m;
 
 	sf::Clock clock;
 	sf::Time delta_time;

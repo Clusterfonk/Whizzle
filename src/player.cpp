@@ -18,8 +18,14 @@
 
 #include "player.h"
 
-Player::Player() {
+Player::Player(std::unique_ptr<sf::TcpSocket>* assign_socket, int unique_id) :
+    socket(std::move(*assign_socket)) { 
+        name = "Player" + unique_id;
 }
 
 Player::~Player() {
+}
+
+sf::TcpSocket* Player::GetSocket(){
+    return socket.get();
 }

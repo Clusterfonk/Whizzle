@@ -1,9 +1,9 @@
-# 
+#
 cmake_minimum_required(VERSION 2.8.9)
 project(Whizzles)
 
 # compile flags
-set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "-Wall -pthread")
 
 # Version
 set(Whizzles_VERSION_MAJOR 1)

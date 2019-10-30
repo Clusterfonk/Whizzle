@@ -18,12 +18,27 @@
 
 #ifndef PLAYER_HEADER
 #define PLAYER_HEADER
+
+#include <SFML/Network.hpp>
+#include <memory>
+#include "card.h"
+
 class Player {
 	public:
-		Player();
+		Player(std::unique_ptr<sf::TcpSocket>* assign_socket, int unique_id);
 		~Player();
 
 		int score = 0;
 		bool isDealer; //TODO: needed?
+
+        sf::TcpSocket* GetSocket();
+        std::string name;
+        int id;
+
+        std::vector<Card> hand;
+
+    private:
+
+        std::unique_ptr<sf::TcpSocket> socket = nullptr;
 };
 #endif
