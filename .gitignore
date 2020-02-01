@@ -1,0 +1,11 @@
+# Ignore folder and its content
+build/
+bin/
+
+# Ignore all obj files
+*.obj
+
+# Ignore profiler data
+perf.data
+
+CMakeLists.txt.user
