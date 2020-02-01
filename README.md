@@ -1,5 +1,7 @@
 # Whizzle
 
+![](assets/main_menu.png/?raw=true)
+
 ## Kurze Zusammenfassung
 
 Umsetzung des Kartenspiels Wizard von Ken Fisher erschienen im Jahr 1984 in Anlehnung an der Deutschen Version vom Verlag Amigo.
