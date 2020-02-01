@@ -1,7 +1,0 @@
-# Ignore folder and its content
-build/
-bin/
-
-# Ignore all obj files
-*.obj
-
